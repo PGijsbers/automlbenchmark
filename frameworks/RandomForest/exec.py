@@ -26,6 +26,7 @@ def extrapolate_with_worst_case(values: List[float], n: int = 5) -> float:
 
 def run(dataset, config):
     log.info(f"\n**** Random Forest [sklearn v{sklearn.__version__}] ****\n")
+    log.info(f"\n**** Running from a branch! ****\n")
 
     is_classification = config.type == 'classification'
     this_process = psutil.Process(os.getpid())
