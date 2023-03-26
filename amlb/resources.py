@@ -121,21 +121,39 @@ class Resources:
         else:
             return self.config.seed
 
+    def framework_from_remote(self, framework, tag):
+        if tag.count(':') != 1:
+            raise ValueError(f"Tag `{tag}` is not a valid repository specification. Use `USER/REPO:BRANCH`.")
+
+        repo, branch = tag.split(':')
+        branch = branch or framework.version
+        framework.version = f"{repo}{':' if repo else ''}{branch}"
+        if repo:
+            framework.project = f"https://github.com/{repo}"
+            framework.setup_args = [branch, framework.project]
+        else:
+            framework.setup_args = [branch]
+
+        return framework
+
     def framework_definition(self, name, tag=None):
         """
         :param name:
         :return: name of the framework as defined in the frameworks definition file
         """
         lname = name.lower()
+        base_framework = next((f for n, f in self._frameworks[default_tag] if n.lower() == lname), None)
         if tag is None:
             tag = default_tag
+        if ':' in tag:
+            remote_framework = self.framework_from_remote(base_framework, tag)
+            return remote_framework, remote_framework.name
         if tag not in self._frameworks:
             raise ValueError("Incorrect tag `{}`: only those among {} are allowed.".format(tag, self.config.frameworks.tags))
         frameworks = self._frameworks[tag]
         log.debug("Available framework definitions:\n%s", frameworks)
         framework = next((f for n, f in frameworks if n.lower() == lname), None)
         # TODO: Clean up this workflow and error messaging as part of #518
-        base_framework = next((f for n, f in self._frameworks[default_tag] if n.lower() == lname), None)
         if framework and framework['removed']:
             raise ValueError(f"Framework definition `{name}` has been removed from the benchmark: {framework['removed']}")
         if not framework and (base_framework and base_framework['removed']):
