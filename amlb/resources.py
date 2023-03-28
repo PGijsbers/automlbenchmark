@@ -126,7 +126,14 @@ class Resources:
             raise ValueError(f"Tag `{tag}` is not a valid repository specification. Use `USER/REPO:BRANCH`.")
 
         repo, branch = tag.split(':')
-        branch = branch or framework.version
+        if not branch and framework.version == "stable":
+            # Default version is typically "stable", but these do not install from a repository,
+            # so instead with a remote, we set the default version to "latest" instead.
+            # The framework setup script *should* translate this to whatever the default branch is.
+            log.info("No branch specified: changing default framework version from 'stable' to 'latest'.")
+            branch = "latest"
+        else:
+            branch = branch or framework.version
         framework.version = f"{repo}{':' if repo else ''}{branch}"
         if repo:
             framework.project = f"https://github.com/{repo}"
