@@ -1,0 +1,36 @@
+site_name: AutoML Benchmark
+theme:
+  name: material
+  features:
+    - navigation.expand
+    - navigation.indexes
+    - content.tabs.link
+  icon:
+    admonition:
+      windows: fontawesome/brands/windows
+
+extra_css:
+  - stylesheets/extra.css
+nav:
+  - getting_started.md
+  - Using the Benchmark:
+      - using/index.md
+      - using/installation.md
+      - using/openml.md
+      - using/aws.md
+      - using/openml.md
+  - Extending the Benchmark:
+      - using/index.md
+      - using/aws.md
+  - contributing.md
+markdown_extensions:
+  - def_list
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
