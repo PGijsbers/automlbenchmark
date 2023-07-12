@@ -20,8 +20,8 @@ nav:
       - extending/index.md
       - extending/benchmark.md
       - extending/constraint.md
-      - extending/framework.md
-  - faq.md
+      - Frameworks: extending/framework.md
+  - FAQ: faq.md
   - contributing.md
 
 extra_css:
@@ -32,6 +32,7 @@ markdown_extensions:
   - admonition
   - pymdownx.details
   - pymdownx.superfences
+  - toc
   - pymdownx.tabbed:
       alternate_style: true
   - attr_list
