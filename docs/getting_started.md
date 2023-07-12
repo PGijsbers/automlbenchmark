@@ -22,23 +22,21 @@ if applicable.
 
 First, clone the repository:
 
-=== ":simple-linux::material-apple: UNIX"
-
-    ```bash
-    git clone https://github.com/openml/automlbenchmark.git --branch stable --depth 1
-    cd automlbenchmark
-    ```
-
-=== ":simple-windows: Windows"
-
-    ```bash
-    git clone https://github.com/openml/automlbenchmark.git --branch stable --depth 1
-    cd automlbenchmark
-    ```
+```bash
+git clone https://github.com/openml/automlbenchmark.git --branch stable --depth 1
+cd automlbenchmark
+```
 
 Create a virtual environments to install the dependencies in:
 
-=== ":simple-linux::material-apple: UNIX"
+=== ":simple-linux: Linux"
+
+    ```bash
+    python -m venv venv
+    source venv/bin/activate
+    ```
+
+=== ":material-apple: MacOS"
 
     ```bash
     python -m venv venv
@@ -77,7 +75,13 @@ See [integrated frameworks](#ADD) for a list of supported frameworks, or the [ad
 ### Example: a test run with Random Forest
 Let's try evaluating the `RandomForest` baseline, which uses [scikit-learn](https://scikit-learn.org/stable/)'s random forest:
 
-=== ":simple-linux: Linux", ":material-apple: MacOS"
+=== ":simple-linux: Linux"
+
+    ```bash
+    python runbenchmark.py randomforest 
+    ```
+
+=== ":material-apple: MacOS"
 
     ```bash
     python runbenchmark.py randomforest 
@@ -89,8 +93,10 @@ Let's try evaluating the `RandomForest` baseline, which uses [scikit-learn](http
     ```bash
     python runbenchmark.py randomforest -m docker
     ```
-    Future example usages will only show the UNIX invocation, but will still require
-    Windows users to add `-m docker`.
+
+    !!! warning "Important"
+        Future example usages will only show invocations without `-m docker` mode,
+        but Windows users will need to run in some non-local mode.
 
 After running the command, there will be a lot of output to the screen that reports
 on what is currently happening. After a few minutes final results are shown and should 
