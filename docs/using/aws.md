@@ -58,7 +58,7 @@ will keep 4 EC2 instances running, monitor them in a dedicated thread, and final
 The console output is still showing the instances starting, outputs the progress and 
 then the results for each dataset/fold combination (log excerpt from different command):
 
-```{.text .long_output }
+```{.text .limit_max_height title="Example output benchmarking H2O on AWS"}
 Running `H2OAutoML_nightly` on `validation` benchmarks in `aws` mode!
 Loading frameworks definitions from ['/Users/me/repos/automlbenchmark/resources/frameworks.yaml'].
 Loading benchmark definitions from /Users/me/repos/automlbenchmark/resources/benchmarks/validationt.yaml.

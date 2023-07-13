@@ -20,6 +20,6 @@
           mask-image: var(--md-admonition-icon--windows);
 }
 
-.md-typeset .long_output code {
-    max-height: 10rem;
+.md-typeset .limit_max_height code {
+    max-height: 20rem;
 }

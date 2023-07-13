@@ -9,7 +9,7 @@ in a flexible manner.
 The default configuration options can be found in the 
 [`resources/config.yaml`](../../resources/config.yaml) file.
 
-```yaml title="resources/config.yaml"
+```{ .yaml title="resources/config.yaml" .limit_max_height }
 --8<-- "resources/config.yaml"
 ```
 
