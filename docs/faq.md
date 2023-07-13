@@ -1,5 +1,8 @@
 # Frequently Asked Questions
 
+If your question is not answered here, please check our Github [issue tracker](https://github.com/openml/automlbenchmark/issues) and [discussion board](https://github.com/openml/automlbenchmark/discussions). 
+If you still can not find an answer, please [open a Q&A discussion on Github](https://github.com/openml/automlbenchmark/discussions/new?category=q-a).
+
 ## (When) will you add framework X?
 
 We are currently not focused on integrating additional AutoML systems.
