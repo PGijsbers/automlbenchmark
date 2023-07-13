@@ -184,27 +184,34 @@ this can be achieved by specifying the `params._save_artifacts` parameter. For e
 
 === "autosklearn"
 
+    Save model descriptions under the `models` subfolder:
     ```yaml
     autosklearn_debug:
       extends: autosklearn
       params:
-        _save_artifacts: ['models']  # will save models descriptions under the `models` subfolder
+        _save_artifacts: ['models'] 
     ```
 
 === "H2O"
 
+    Save the leaderboard and models under the `models` subfolder, 
+    and the H2O logs under `logs` subfolder:
     ```yaml
     H2OAutoML_debug:
       extends: H2OAutoML
       params:
-        _save_artifacts: ['leaderboard', 'logs', 'models']  # will save the leaderboard and models under the `models` subfolder, and the H2O logs under `logs` subfolder.
+        _save_artifacts: ['leaderboard', 'logs', 'models'] 
     ```
 
 === "TPOT"
 
+    Save the description of models for the Pareto frontin the `models` subfolder:
     ```yaml
     TPOT_debug:
       extends: TPOT
       params:
         _save_artifacts: ['models']
     ```
+
+The framework integrations themselves determine where the artifacts are saved,
+this is typically not configurable from the framework definition.
