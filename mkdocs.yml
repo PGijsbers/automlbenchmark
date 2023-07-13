@@ -32,18 +32,18 @@ extra_css:
 markdown_extensions:
   - def_list
   - admonition
+  - toc
+  - attr_list
   - pymdownx.details
   - pymdownx.superfences
   - pymdownx.snippets
-  - toc
+  - pymdownx.inlinehilite
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
       pygments_lang_class: true
-  - pymdownx.inlinehilite
   - pymdownx.tabbed:
       alternate_style: true
-  - attr_list
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg

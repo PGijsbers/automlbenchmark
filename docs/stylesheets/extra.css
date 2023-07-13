@@ -19,3 +19,7 @@
   -webkit-mask-image: var(--md-admonition-icon--windows);
           mask-image: var(--md-admonition-icon--windows);
 }
+
+.md-typeset .long_output code {
+    max-height: 10rem;
+}
