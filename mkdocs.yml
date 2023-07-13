@@ -14,7 +14,7 @@ nav:
   - getting_started.md
   - Using the Benchmark:
       - using/index.md
-      - using/parameters.md
+      - Parameters: using/parameters.md
       - Configuration: using/configuration.md
       - using/aws.md
       - using/result_analysis.md
