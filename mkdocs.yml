@@ -11,9 +11,10 @@ theme:
     admonition:
       windows: fontawesome/brands/windows
 extra:
-  homepage: https://openml.github.io/automlbenchmark/index.html
+  homepage: ../index.html
 
 nav:
+  - index.md
   - getting_started.md
   - Using the Benchmark:
       - Parameters: using/parameters.md
