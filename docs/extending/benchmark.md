@@ -1,156 +1,184 @@
+# Benchmark
 
+Benchmarks are collections of machine learning tasks, where each task is a dataset
+with associated information on train/test splits used to evaluate the model.
+These tasks can be defined in a `yaml` file or on [OpenML](https://www.openml.org).
+Both options allow for defining a benchmark of one or more datasets.
+It is even possible to reference to OpenML tasks from a benchmark file.
 
-## Add a benchmark
+!!! note "Supported Datasets"
+    
+    Currently, the AutoML benchmark only supports definitions of tabular datasets for
+    classification, regression, and time series forecasting. The time series forecasting
+    support is in an early stage, subject to change, and not supported through OpenML.
 
-In this section, `benchmark` means a suite of datasets that can be used to feed any of the available frameworks, in combination with a set of constraints (time limit, cpus, memory) enforced by the application.
+## Defining a Benchmark on OpenML
+Especially when performing a benchmark evaluation to be used in a publication, we
+recommend the use of OpenML for the definition of the benchmark if possible. This
+ensures that other users can run your benchmark out of the box, without any required
+additional files. OpenML also provides a lot of meta-data about the datasets which is
+also accessible through [APIs](https://www.openml.org/apis) in various programming 
+languages. We recommend using the [`openml-python`](https://openml.github.io/openml-python)
+Python library as it is the most comprehensive of the OpenML libraries.
 
-A benchmark definition will then consist in a [datasets definition](#datasets-definition) and a [constraints definition](#constraint-definition).
+Defining a benchmark on OpenML requires the following steps:
 
-Each dataset must contain a training set and a test set. There can be multiple training/test splits, in which case each split is named a `fold`, so that the same dataset can be benchmarked multiple times using a different fold.
+ - [Upload a dataset](https://openml.github.io/openml-python/main/examples/30_extended/create_upload_tutorial.html#sphx-glr-examples-30-extended-create-upload-tutorial-py). 
+   A dataset is the tabular data, alongside meta-data like its name,
+   authors, and license. OpenML will also automatically extract meta-data about the
+   datasets, such as feature types, class balance, or dataset size. After uploading the
+   dataset, it will receive an identifier (`ID`) and should be visible on the OpenML
+   website on `www.openml.org/d/ID`.
+ - [Define a task](https://openml.github.io/openml-python/main/generated/openml.tasks.create_task.html#openml.tasks.create_task). 
+   A task defines how to evaluate a model on a given dataset, for example
+   "10-fold cross-validation optimizing AUC". OpenML will generate splits for the 10-fold
+   cross-validation procedure which means that anyone using this task definition can 
+   perform the experiment with the exact same splits easily.
+ - [Define a benchmark suite](https://openml.github.io/openml-python/main/examples/30_extended/suites_tutorial.html#sphx-glr-examples-30-extended-suites-tutorial-py). 
+   On a technical level, a benchmarking suite is nothing more than a collection of tasks. 
+   You can add a description that details the purpose of the benchmarking suite, or any 
+   information that users should be aware of before using the suite.
 
-### Datasets definition
+When a task or benchmark suite is available on OpenML, it can be directly referred to
+for the `benchmark` parameter of `runbenchmark.py` as `openml/s/ID` for suites and 
+`openml/t/ID` for tasks, where `ID` is to be replaced with the OpenML identifier of the
+object. For example, `openml/t/59` refers to [task 59](https://www.openml.org/t/59), 
+which is 10-fold cross-validation on the [iris dataset](https://www.openml.org/d/61).
 
-A dataset definition consists in a `yaml` file listing all the task/datasets that will be used for the complete benchmark, 
-or as an OpenML suite.
+## Defining a Benchmark with a File
 
-Default dataset definitions are available under folder `resources/benchmarks`.
+When defining a benchmark with a `yaml` file, the `yaml` will contain information about
+tasks that are located either on disk or on OpenML. We make a few default benchmarks
+available in our [`resources/benchmarks`](../../resources/benchmarks) folder:
 
-Each task/dataset must have a `name` that should be unique (ignoring case) in the given definition file, it will also be used as an identifier, for example in the results.
+ * `test`: a collection of three small datasets covering regression, binary classification, 
+    and multiclass classification. This makes it incredibly useful for small tests and
+    fast feedback on whether the software runs without error.
+ * `validation`: a collection of datasets which have different edge cases, such as a
+    very wide dataset, datasets with missing or non-numerical values, and more. This
+    typically produces most errors you might also encounter when running larger 
+    benchmarks.
+ * `timeseries`: a benchmark for testing time series forecasting integration (experimental).
 
-This `name` can also be used on the command line (`-t` or `--task` argument) when we just want to execute a subset of the benchmark, often in combination with a specific fold (`-f` or `--fold` argument):
-```bash
-python runbenchmark.py randomforest validation -t bioresponse
-python runbenchmark.py randomforest validation -t bioresponse eucalyptus
-python runbenchmark.py randomforest validation -t bioresponse -f 0
-python runbenchmark.py randomforest validation -t bioresponse eucalyptus -f 0 1 2
-``` 
+Below is an excerpt from the `test.yaml` file:
 
-_Example:_
-
-Following the [custom configuration](#custom-configuration), it is possible to override and/or add custom benchmark definitions by creating for example a `mybenchmark.yaml` file in your `user_dir/benchmarks`.
-
-The benchmark can then be tested and then executed using the `1h4c` constraint:
-```bash
-python runbenchmark.py randomforest mybenchmark
-python runbenchmark.py randomforest mybenchmark 1h4c
-```
-
-
-#### OpenML datasets
-
-[OpenML] datasets are verified and annotated datasets, making them easy to consume.
-However, the application doesn't directly consume those datasets today as the split between training data and test data is not immediately available.
-For this we use [OpenML] tasks.
-
-#### OpenML tasks
-
-[OpenML] tasks provide ready to use datasets, usually split in 10-folds: for each fold, we have 1 training set and a test set.
-
-The automlbenchmark application can directly consume those tasks using the following definition:
 ```yaml
-- name: bioresponse
-  openml_task_id: 9910
-```
-where `openml_task_id` allows accessing the OpenML task at `https://www.openml.org/t/{openml_task_id}` (in this example: <https://www.openml.org/t/9910>). 
-
-Alternatively, you can run the benchmark on a single OpenML task without writing a benchmark definition:
-```bash
-python runbenchmark.py randomforest openml/t/59
+- name: kc2
+  openml_task_id: 3913
+  description: "binary test dataset"
 ```
 
-#### File datasets
+When writing your own benchmark definition, it needs to be discoverable by the benchmark.
+A good place to do this would be adding a `benchmarks` directory to your benchmark
+configuration directory (`~/.config/automlbenchmark` by default) and updating your
+[custom configuration](../../using/configuration/#custom-configurations) by adding:
 
-It is also possible to benchmark your own datasets, as soon as they follow some requirements:
-- The data files should be in one of the currently supported format: [ARFF], [CSV] (ideally with header).
-- Each dataset must contain at least one file for training data and one file for test data.
-- If the dataset is represented as an archive (.zip, .tar, .tgz, .tbz) or a directory, then the data files must follow this naming convention to be detected correctly:
-  - if there's only one file for training and one for test, they should be named `{name}_train.csv` and `{name}_test.csv` (in case of CSV files).
-  - if there are multiple `folds`, they should follow a similar convention: `{name}_train_0.csv`, `{name}_test_0.csv``, {name}_train_1.csv`, `{name}_test_1.csv`, ...
-
-_Example:_
-
-Then the datasets can be declared in the benchmark definition file as follow:
 ```yaml
----
+benchmarks:                     
+  definition_dir:               
+    - '{root}/resources/benchmarks'
+    - '{user}/resources/benchmarks'
+```
 
-- name: example_csv
-  dataset:
-    train: /path/to/data/ExampleTraining.csv
-    test:  /path/to/data/ExampleTest.csv
-    target: TargetColumn
-  folds: 1
+Each task must have a name that is unique in the definition file (case-insensitive),
+this name will also be used as identifier (e.g., in the results files).
+Additionally, the file must have a description of where to find the dataset files
+and splits. When you have a task already on OpenML, you can directly reference it with
+`openml_task_id` to define the dataset and splits. Alternatively, you can use local files.
 
-- name: example_multi_folds
-  dataset:
-    train: 
-      - /path/to/data/ExampleTraining_0.csv
-      - /path/to/data/ExampleTraining_1.csv
-    test:  
-      - /path/to/data/ExampleTest_0.csv
-      - /path/to/data/ExampleTest_1.csv
-    target: TargetColumn
-  folds: 2
+It is also possible to benchmark your own datasets that you can not or do not want to
+upload to OpenML. The data files should be in `arff` or `csv` format and contain at least 
+one file for training data and one file for test data. When working with multiple files,
+it is useful to use an archive (`.zip`, `.tar`, `.tgz`, `.tbz`) or directory structure. 
+Use the following naming convention to allow the AutoML benchmark to infer what each file represents:
 
-- name: example_dir   # let's assume that the data folder contains 2 files: example_train.arff and example_test.arff
-  dataset: 
-    path: /path/to/data
-    target: TargetColumn
-  folds: 1
+    - if there's only one file for training and one for test, they should be named `{name}_train.csv` and `{name}_test.csv` (in case of CSV files).
+    - if there are multiple `folds`, they should follow a similar convention: `{name}_train_0.csv`, `{name}_test_0.csv``, {name}_train_1.csv`, `{name}_test_1.csv`, ...
 
-- name: example_dir_multi_folds   # let's assume that the data folder contains 6 files: example_train_0.arff, ..., example_train_2.arff, example_test_0.arff, ...
-  dataset: 
-    path: /path/to/data
-    target: TargetColumn
-  folds: 3
+Examples:
 
-- name: example_archive  # let's assume that archive contains the same files as for example_dir_multi_folds
-  dataset:
-    path: /path/to/archive.zip
-    target: TargetColumn
-  folds: 3
+=== "Single Fold CSV"
 
-- name: example_csv_http
-  dataset:
-    train: https://my.domain.org/data/ExampleTraining.csv
-    test:  https://my.domain.org/data/ExampleTest.csv
-    target: TargetColumn
-  folds: 1
+    ```yaml
+    - name: example_csv
+      dataset:
+        train: /path/to/data/ExampleTraining.csv
+        test:  /path/to/data/ExampleTest.csv
+        target: TargetColumn
+      folds: 1
+    ```
 
-- name: example_archive_http
-  dataset:
-    path: https://my.domain.org/data/archive.tgz
-    target: TargetColumn
-  folds: 3
+=== "Multiple Folds CSV"
 
-- name: example_autodetect
-  dataset: /path/to/data/folder
+    ```yaml
+    - name: example_multi_folds
+      dataset:
+        train: 
+          - /path/to/data/ExampleTraining_0.csv
+          - /path/to/data/ExampleTraining_1.csv
+        test:  
+          - /path/to/data/ExampleTest_0.csv
+          - /path/to/data/ExampleTest_1.csv
+        target: TargetColumn
+      folds: 2
+    ```
 
-- name: example_relative_to_input_dir
-  dataset: "{input}/data/folder"
+=== "Directory"
 
+    It is important that the files in the directory follow the naming convention described above.
+
+    ```yaml
+    - name: example_dir
+      dataset: 
+        path: /path/to/data
+        target: TargetColumn
+      folds: 1
+    ```
+
+=== "Archive"
+
+    It is important that the files in the archive follow the naming convention described above.
+
+    ```yaml
+    - name: example_archive
+      dataset:
+        path: /path/to/archive.zip
+        target: TargetColumn
+      folds: 3
+    ```
+
+=== "Remote Files"
+
+    The remote file may also be an archive. If that is the case, it is important that 
+    the files in the archive follow the naming convention described above.
+
+    ```yaml
+    - name:  example_csv_http
+      dataset:
+        train: https://my.domain.org/data/ExampleTraining.csv
+        test:  https://my.domain.org/data/ExampleTest.csv
+        target: TargetColumn
+      folds: 1
+    ```
+
+    Remote files are downloaded to the `input_dir` folder and archives are decompressed 
+    there as well. You can change the value of this folder in your 
+    [custom config.yaml file](../../using/configuration/#custom-configurations) 
+    or specify it at the command line with the `-i` or `--indir` argument 
+    (by default, it points to the `~/.openml/cache` folder).
+
+
+The `target` attribute is optional but recommended. If not set, it will resolve to the 
+column `target` or `class` if present, and the last column otherwise.
+
+You can even make use of the [special directives](../../using/configuration/#custom-configurations) like `{user}`.
+
+```yaml
 - name: example_relative_to_user_dir
   dataset:
     train: "{user}/data/train.csv"
     test: "{user}/data/test.csv"
-
-```
-**Note**:
-- the naming convention is required only when `path` is pointing to a directory or an archive. If the files are listed explicitly, there's no constraint on the file names.
-- the `target` attribute is optional but recommended, otherwise the application will try to autodetect the target:
-  0. looking for a column named `target` or `class`.
-  0. using the last column as a fallback.
-- the `folds` attribute is also optional but recommended for those datasets as the default value is `folds=10` (default amount of folds in openml datasets), so if you don't have that many folds for your custom datasets, it is better to declare it explicitly here.
-- Remote files are downloaded to the `input_dir` folder and archives are decompressed there as well, so you may want to change the value of this folder in your [custom config.yaml file](#custom-configuration) or specify it at the command line with the `-i` or `--indir` argument (by default, it points to the `~/.openml/cache` folder).
-
-#### OpenML suites
-
-[OpenML] suites are a collection of OpenML tasks, for example <https://www.openml.org/s/218>.
-You can run the benchmark on an openml suite directly, without defining the benchmark in a local file:
-```bash
-python runbenchmark.py randomforest openml/s/218
 ```
 
-You can define a new OpenML suite yourself, for example through the Python API.
-[This openml-python tutorial](https://openml.github.io/openml-python/master/examples/30_extended/suites_tutorial.html#sphx-glr-examples-30-extended-suites-tutorial-py)
-explains how to build your own suite.
-An advantage of using an OpenML suite is that sharing it is easy as the suite and its datasets can be accessed through APIs in many programming languages.
+After creating a benchmark definition, e.g. `~/.config/automlbenchmark/benchmarks/my_benchmark.yaml`,
+it can then be referenced when running `runbenchmark.py`: `python runbenchmark.py FRAMEWORK my_benchmark`.

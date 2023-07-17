@@ -1,5 +1,7 @@
 # Parameters of `runbenchmark.py`
 
+The parameters of the `runbenchmark.py` script can be shown with:
+
 ```{ .text title="python runbenchmark.py --help" .limit_max_height }
 usage: runbenchmark.py [-h] [-m {local,aws,docker,singularity}] [-t [task_id ...]] [-f [fold_num ...]] [-i input_dir] [-o output_dir] [-u user_dir] [-p parallel_jobs] [-s {auto,skip,force,only}] [-k [true|false]]
                        [-e] [--logging LOGGING] [--openml-run-tag OPENML_RUN_TAG]

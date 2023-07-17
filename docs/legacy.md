@@ -1,5 +1,15 @@
 Installation:
 
+
+## Add a benchmark
+
+In this section, `benchmark` means a suite of datasets that can be used to feed any of the available frameworks, in combination with a set of constraints (time limit, cpus, memory) enforced by the application.
+
+A benchmark definition will then consist in a [datasets definition](#datasets-definition) and a [constraints definition](#constraint-definition).
+
+Each dataset must contain a training set and a test set. There can be multiple training/test splits, in which case each split is named a `fold`, so that the same dataset can be benchmarked multiple times using a different fold.
+
+
 or using pyenv:
 ```bash
 pyenv install {python_version: 3.9.16}
