@@ -2,6 +2,22 @@
 
 The AutoML benchmark supports running experiments on [AWS EC2](https://aws.amazon.com/ec2/).
 
+!!! danger "AMLB does not limit expenses!"
+
+    The AWS integration lets your easily conduct massively parallel evaluations.
+    The AutoML Benchmark does not in any way restrict the _total_ costs you can make on AWS.
+    However, there are some tips for [reducing costs](#reducing-costs).
+
+    ??? danger "Example Costs"
+
+        For example, benchmarking one framework on the classification and regression suites
+        on a one hour budget takes 1 hour * 10 folds * 100 datasets = 1,000 hours, plus
+        overhead. Even when using spot instance pricing on `m5.2xlarge` instances (default)
+        probably costs at least $100 US (prices depend on overhead and fluctating prices).
+        A full evaluation with multiple frameworks and/or time budgets can cost
+        thousands of dollars. 
+
+
 ## Setup
 
 To run a benchmark on AWS you additionally need to have a configured AWS account.
@@ -128,3 +144,19 @@ aws:
       enabled: true
       max_hourly_price: 0.40  # comment out to use default
 ```
+
+### Reducing Costs
+
+The most important thing you can do to reduce costs is to critically evaluate which
+experimental results can be re-used from previous publications. That said, when
+conducting new experiments on AWS we have the following recommendations to reduce costs:
+
+ - Use spot instances with a fixed maximum price: set `aws.ec2.spot.enabled: true` and `aws.ec2.spot.max_hourly_price`. 
+   Check which region has [the lowest spot instance prices](https://aws.amazon.com/ec2/spot/)
+   and configure `aws.region` accordingly. 
+ - Skip the framework installation process by providing a docker image and setting `aws.docker_enabled: true`.
+ - Set up [AWS Budgets](https://aws.amazon.com/aws-cost-management/aws-budgets/)
+   to get alerts early if forecasted usage exceeds the budget. It should also be
+   technically possibly to automatically shut down all running instances in a region
+   if a budget is exceeded, but this naturally leads to a loss of experimental results, so
+   it is best avoided.
