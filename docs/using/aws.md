@@ -126,7 +126,7 @@ When using AWS mode, the application will use `on-demand` EC2 instances from the
 series by default. However, it is also possible to use `Spot` instances, specify a 
 `max_hourly_price`, or customize your experience when using this mode in general.
 All configuration points are grouped and documented under the `aws` yaml namespace in 
-the main [config](../../resources/config.yaml) file.
+the main [config](GITHUB/resources/config.yaml) file.
 When setting  your own configuration, it is strongly recommended to first create your 
 own `config.yaml` file as described in [Custom configuration](configuration.md#custom-configurations).
 Here is an example of a config file using Spot instances on a non-default region:

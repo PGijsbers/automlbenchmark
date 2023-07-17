@@ -2,7 +2,7 @@
 
 Constraint definitions allow a set of common constraints to be applied to all tasks in 
 a benchmark. Default constraint definitions are available in 
-[`resources/constraint.yaml`](../../resources/constraint.yaml).
+[`resources/constraint.yaml`](GITHUB/resources/constraint.yaml).
 When no constraint is specified at the command line, the `test` constraint definition is used by default.
 
 A constraint definition can consist of the following constraints:

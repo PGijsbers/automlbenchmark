@@ -7,7 +7,7 @@ in a flexible manner.
 ## Configuration Options
 
 The default configuration options can be found in the 
-[`resources/config.yaml`](../../resources/config.yaml) file.
+[`resources/config.yaml`](GITHUB/resources/config.yaml) file.
 
 ```{ .yaml title="resources/config.yaml" .limit_max_height }
 --8<-- "resources/config.yaml"

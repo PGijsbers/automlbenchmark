@@ -163,7 +163,7 @@ for the `runbenchmark.py` script, but the most important ones are:
 
 `Constraints (optional, default='test')`
 
-: The constraints applied to the benchmark as defined by default in [constraints.yaml](../resources/constraints.yaml).
+: The constraints applied to the benchmark as defined by default in [constraints.yaml](GITHUB/resources/constraints.yaml).
   These include time constraints, memory constrains, the number of available cpu cores, and more.
   Default constraint is `test` (2 folds for 10 min each). 
 

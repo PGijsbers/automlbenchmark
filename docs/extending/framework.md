@@ -115,7 +115,7 @@ python runbenchmark.py h2oautoml_blending -u examples/custom
 
 *Note:*
 
-By default, when generating a [docker image](README.md#in-docker-image), the image name is created as `automlbenchmark/{framework}:{version}-{branch}` with the framework name in lowercase, and `branch` being the branch of the `automlbenchmark` app (usually `stable`).
+By default, when generating a docker image, the image name is created as `automlbenchmark/{framework}:{version}-{branch}` with the framework name in lowercase, and `branch` being the branch of the `automlbenchmark` app (usually `stable`).
 However, it is possible to customize this image name as follow:
 ```yaml
 MyFramework:
@@ -355,7 +355,7 @@ Using the instructions above:
     > python runbenchmark.py myframework -m docker
  1. if this works, try to run it in aws: 
     > python runbenchmark.py myframework -m aws
- 1. add a brief description of the framework to the documentation in [docs/automl_overview](./automl_overview.md) following the same formatting as the other entries.
+ 1. add a brief description of the framework to the documentation in [docs/website/framework.html](../frameworks.html) following the same formatting as the other entries.
  1. create a pull request, and ask a review from authors of `automlbenchmark`: they'll also be happy to help you during this integration.
 
 #### Add a custom framework
@@ -367,7 +367,7 @@ In this case, as we've seen above, there's always the possibility to integrate y
 Using the instructions above:
 
  1. define what is (or will be) your custom `user_dir` for this framework.
- 1. ensure it contains a `config.yaml`, otherwise create one (for example copy [this one](#custom-configuration) or `examples/custom/config.yaml`).
+ 1. ensure it contains a `config.yaml`, otherwise create one (for example copy [this one](../using/configuration.md#custom-configurations) or `examples/custom/config.yaml`).
  1. create the framework module somewhere under this `user_dir`, e.g. `{user_dir}/extensions/MyFramework`.
  1. define the module in `{user_dir}/frameworks.yaml` (create the file if needed).
  1. follow the same steps as for a "default" framework to implement the integration: setup, test, ... except that you always need to specify the `user_dir`, e.g. for testing:
