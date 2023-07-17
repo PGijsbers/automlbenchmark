@@ -1,8 +1,15 @@
 # Adding an AutoML Framework
 
+!!! warning "Rewrite in progress"
+
+    Most information on this page is accurate, and it should be complete enough to use.
+    However, it hasn't been updated to make use of `mkdocs-materials` features, and
+    _might_ have some outdated examples. Contributions welcome.
+
 ## Add an AutoML framework
 
 Adding an AutoML framework consist in several steps:
+
  1. create a Python module that will contain everything related to the integration of this framework.
  1. define the framework in a [Framework definition](#framework-definition) file.
  1. write some integration code
@@ -13,6 +20,7 @@ Adding an AutoML framework consist in several steps:
 ### Framework definition
 
 The framework definition consists in an entry in a `yaml` file with the framework name and some properties
+
  1. to describe the framework and define which version will be used: `project`, `version`.
  1. to indicate the Python module with the integration code: `module` or `extends`.
  1. to pass optional parameters to the framework and/or the integration code: `params`.
@@ -75,6 +83,7 @@ H2OAutoML_custom:
 ```
 
 This example shows
+
 - the definitions for 2 new frameworks: `GradientBoosting` and `Stacking`. 
   - Those definitions (optionally) externalize some parameters (e.g. `n_estimators`): the `params` property always appears in json format in the results, so that we can clearly see what has been tuned when analyzing the results later.
   - Note that the module is case sensitive and should point to the module containing the integration code.
@@ -127,6 +136,7 @@ If the framework definition allows to use the new framework from the application
 There are already several frameworks already integrated under `frameworks` directory (+ the examples under `examples/custom`), so the best starting point when adding a new framework is to first look at the existing ones.
 
 Among the existing frameworks, we can see different type of integrations:
+
 - trivial integration: these are frameworks running on Python and using dependencies (`numpy`, `sklearn`) already required by the application itself. These are not really AutoML toolkits, but rather integrations using `sklearn` to provide a reference when analyzing the results: cf. `constantpredictor`, `DecisionTree`.
 - Python API integration: these are frameworks that can be run directly from Python: cf. `autosklearn`, `H2OAutoML`, `TPOT`, `RandomForest`, `TunedRandomForest`.
    - contrary to the trivial integration, those require a `setup` phase.
@@ -164,6 +174,7 @@ def run(*args, **kwargs):
 ```
 
 where we see that the module should expose (only `run` is actually required) the following functions:
+
 - `setup` (optional): called by the application to setup the given framework, usually by simply running a `setup.sh` script that will be responsible for potentially creating a local virtual env, downloading and installing the dependencies. 
    The `setup` function can also receive the optional `setup_args` param from the [framework definition](#framework-definition) as an argument. 
 - `run`: called by the benchmark application to execute a task against the framework, using the selected dataset and constraints. We will describe the parameters in detail below, for now, just note that by convention, we just load the `exec.py` file from the module and delegate the execution to its `run` function.
@@ -189,6 +200,7 @@ frameworks/RandomForest/
 ```
 
 Noticeable differences with a basic integration:
+
 - the `venv` is created in `setup.sh` by passing the current dir when sourcing the `shared/setup.sh` script: `. $HERE/../shared/setup.sh $HERE`.
 - the `run` function in `__init__.py` prepares the data (in the application environment) before executing the `exec.py` in the dedicated `venv`. The call to `run_in_venv` is in charge of serializing the input, calling `exec.py` and deserializing + saving the results from `exec`.
 - `exec.py`, when calls in the subprocess (function `__main__`), calls `call_run(run)` which deserializes the input (dataset + config) and passes it to the `run` function that just need to return a `result` object.
@@ -301,6 +313,7 @@ Is called "default framework" an AutoML framework whose integration is available
 
 *NOTE:*
 There are a few requirements when integrating a new default framework:
+
 - The code snippet triggering the training should use only defaults (no AutoML hyper parameters), plus possibly a generic `**kwargs` in order to support `params` section in custom framework definitions.  In other words, one of the requirements for being included in the benchmark is that the framework is submitted without any tweaks to default settings.  This is to prevent submissions (systems) from overfitting or tuning to the benchmark.
 - There must be a way to limit the runtime of the algorithm (a maximum runtime parameter).
 - Exceptions:
@@ -325,6 +338,7 @@ bad_framework:
 ```
 
 Using the instructions above:
+
  1. verify that there is an issue created under <https://github.com/openml/automlbenchmark/issues> for the framework you want to add, or create one.
  1. create a private branch for your integration changes.
  1. create the framework module (e.g. `MyFramework`) under `frameworks` folder.
@@ -351,6 +365,7 @@ You may want to integrate a framework without wanting to make this publicly avai
 In this case, as we've seen above, there's always the possibility to integrate your framework in a custom `user_dir`.
 
 Using the instructions above:
+
  1. define what is (or will be) your custom `user_dir` for this framework.
  1. ensure it contains a `config.yaml`, otherwise create one (for example copy [this one](#custom-configuration) or `examples/custom/config.yaml`).
  1. create the framework module somewhere under this `user_dir`, e.g. `{user_dir}/extensions/MyFramework`.

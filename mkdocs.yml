@@ -13,7 +13,6 @@ theme:
 nav:
   - getting_started.md
   - Using the Benchmark:
-      - using/index.md
       - Parameters: using/parameters.md
       - Configuration: using/configuration.md
       - using/aws.md
