@@ -41,7 +41,7 @@ jobs:
       - name: Echo Inputs # Just for debugging purposes
         run: echo "${{ toJSON(github.event.inputs) }}"
 
-  run_benchmark:
+  run:
     needs: [set_os]
     strategy:
       fail-fast: false
