@@ -9,7 +9,7 @@ permissions:
 
 on:
   schedule:
-    - cron: '20 * * * *'
+    - cron: '1/5 * * * *'
 
   workflow_dispatch:
     inputs:
@@ -58,9 +58,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Stop Matrix Jobs on Dispatch
-        if: (inputs.python_version != '') && !(( matrix.framework == inputs.framework ) && ( matrix.os == inputs.os )&& ( matrix.python == inputs.python_version ))
-        # (The job is started by a workflow dispatch) && !(this is the matrix job that represents the workflow trigger)
+        if: (github.event_name == 'workflow_dispatch') && !(( matrix.framework == inputs.framework ) && ( matrix.os == inputs.os )&& ( matrix.python == inputs.python_version ))
         run: |
+          echo "Workflow triggered by workflow_dispatch, and current configuration is not the one specified in dispatch."
           exit 1
       - name: Runs on ${{ matrix.os }}
         run: |
@@ -83,17 +83,21 @@ jobs:
         env:
           GITHUB_PAT: ${{ secrets.PUBLIC_ACCESS_GITHUB_PAT }}
       - name: Report Installation Failure
-        if: failure() && steps.install.conclusion == 'failure' && matrix.framework != ''
+        if: failure() && steps.install.conclusion == 'failure' && matrix.framework != '' && github.event_name != 'workflow_dispatch'
         run: |  # https://github.com/orgs/community/discussions/8945 can't link to job in matrix...
           LOG_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/"
           TITLE="${{ matrix.framework }} failed to install"
           NUMBERS=$(gh issue list --json number,title,closed --jq '.[] | select( .title == "'"$TITLE"'") | select( .closed == false ) | {number: .number}')
           echo "Found " $(echo "$NUMBERS" | wc -l) " issues: $NUMBERS"
           NUMBER=$(echo "$NUMBERS" | sed -E 's/[^0-9]//g' | head -n1)
+          
+          echo "During a routine test installation of ${{ matrix.framework }} failed.\n"\
+               "For more information, see the logs: $LOG_URL\n" > error.txt
+          
           if [[ -z "$NUMBER" ]]; then  
-            gh issue create --title "$TITLE" --label "bot" --body "$LOG_URL"
+            gh issue create --title "$TITLE" --label "bot" --body-file error.txt
           else
-            gh issue comment "$NUMBER" --body "issues persist: $LOG_URL"
+            gh issue comment "$NUMBER" --body-file error.txt
           fi
         env:
           GH_TOKEN: ${{ github.token }}
@@ -101,9 +105,21 @@ jobs:
         id: run
         run: python runbenchmark.py ${{ matrix.framework }} ${{ matrix.options }} -f 0
       - name: Report Running Failure
-        if: failure() && steps.run.conclusion == 'failure'
+        if: failure() && steps.run.conclusion == 'failure' && github.event_name != 'workflow_dispatch'
         run: |
           LOG_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/"
-          gh issue create --title "${{ matrix.framework }} fails on test" --label "bot" --body "$LOG_URL"
+          TITLE="${{ matrix.framework }} fails on test"
+          NUMBERS=$(gh issue list --json number,title,closed --jq '.[] | select( .title == "'"$TITLE"'") | select( .closed == false ) | {number: .number}')
+          echo "Found " $(echo "$NUMBERS" | wc -l) " issues: $NUMBERS"
+          NUMBER=$(echo "$NUMBERS" | sed -E 's/[^0-9]//g' | head -n1)
+          
+          echo "During a routine test ${{ matrix.framework }} installed successfully but failed to pass the test benchmark.\n"\
+               "For more information, see the logs: $LOG_URL\n" > error.txt
+          
+          if [[ -z "$NUMBER" ]]; then  
+            gh issue create --title "$TITLE" --label "bot" --body-file error.txt
+          else
+            gh issue comment "$NUMBER" --body-file error.txt
+          fi
         env:
           GH_TOKEN: ${{ github.token }}
