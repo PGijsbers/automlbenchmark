@@ -69,10 +69,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
-      - name: Install Py${{ matrix.python_version }}
+      - name: Install Py${{ matrix.python }}
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python_version }}
+          python-version: ${{ matrix.python }}
       - name: Install benchmark dependencies
         run: |
           python -m pip install --upgrade pip
