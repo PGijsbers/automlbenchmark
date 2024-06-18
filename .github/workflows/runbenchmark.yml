@@ -17,6 +17,10 @@ on:
 
 jobs:
   set_os:
+    # The matrix of the next job includes an extra job that is defined by the workflow dispatch input
+    # However, on a scheduled job, this input is an empty string. Which means that it can not be
+    # directly used in the `runs-on` field. So we set up a variable to use for `runs-on` that
+    # is always populated
     runs-on: 'ubuntu-latest'
     outputs:
       os: ${{ steps.os.outputs.os }}
@@ -24,11 +28,14 @@ jobs:
       - id: os
         run: |
           echo "os=${{ inputs.os }}" >> "$GITHUB_OUTPUT"
-          if [[ -z ${{ inputs.os }} ]]; then
+          if [[ -z "${{ inputs.os }}" ]]; then
             echo "os=ubuntu-latest" >> "$GITHUB_OUTPUT"
           fi
+      - name: Echo Inputs # Just for debugging purposes
+        run: echo "${{ toJSON(github.event.inputs) }}"
 
   run_benchmark:
+    needs: [set_os]
     strategy:
       fail-fast: false
       matrix:
@@ -37,7 +44,7 @@ jobs:
         framework: ['autogluon', 'autosklearn', 'flaml', 'gama', 'h2oautoml','lama', 'naml', 'randomforest', 'tpot']
         include:
           - python: ${{ inputs.python_version }}
-            os: ${{ inputs.os }}
+            os: ${{ needs.set_os.outputs.os }}
             framework: ${{ inputs.framework }}
             options: ${{ inputs.options }}
 
