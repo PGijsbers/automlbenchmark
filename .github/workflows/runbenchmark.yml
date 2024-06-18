@@ -25,7 +25,7 @@ on:
 jobs:
   set_os:
     # The matrix of the next job includes an extra job that is defined by the workflow dispatch input
-    # However, on a scheduled job, this input is an empty string. Which means that it can not be
+    # However, on a scheduled job this input is an empty string. Which means that it can not be
     # directly used in the `runs-on` field. So we set up a variable to use for `runs-on` that
     # is always populated
     runs-on: 'ubuntu-latest'
@@ -103,7 +103,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
       - name: Benchmark ${{ matrix.framework }}
         id: run
-        run: python runbenchmark.py ${{ matrix.framework }} ${{ matrix.options }} -f 0
+        run: |
+          python runbenchmark.py ${{ matrix.framework }} ${{ matrix.options }} -f 0
+          if grep -q "Error" "results/results.csv"; then
+            exit 1
+          fi
       - name: Report Running Failure
         if: failure() && steps.run.conclusion == 'failure' && github.event_name != 'workflow_dispatch'
         run: |
@@ -113,8 +117,9 @@ jobs:
           echo "Found " $(echo "$NUMBERS" | wc -l) " issues: $NUMBERS"
           NUMBER=$(echo "$NUMBERS" | sed -E 's/[^0-9]//g' | head -n1)
           
-          echo "During a routine test ${{ matrix.framework }} installed successfully but failed to pass the test benchmark.\n"\
-               "For more information, see the logs: $LOG_URL\n" > error.txt
+          echo "During a routine test ${{ matrix.framework }} installed successfully but failed to pass the test benchmark." > error.txt
+          cat results/results.csv >> error.txt
+          echo "For more information, see the logs: $LOG_URL\n"
           
           if [[ -z "$NUMBER" ]]; then  
             gh issue create --title "$TITLE" --label "bot" --body-file error.txt
@@ -123,3 +128,9 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ github.token }}
+      - name: Save Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.framework }}-results
+          path: results
