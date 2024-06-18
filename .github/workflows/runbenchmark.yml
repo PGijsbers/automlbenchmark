@@ -84,7 +84,9 @@ jobs:
           GITHUB_PAT: ${{ secrets.PUBLIC_ACCESS_GITHUB_PAT }}
       - name: Report Installation Failure
         if: failure() && steps.install.conclusion == 'failure'
-        run: echo "Installation failure!"
+        run: |
+          LOG_URL="https://github.com/PGijsbers/automlbenchmark/actions/runs/9562001614/job/26357453940#step:7:1"
+          github issue create --title "${{ matrix.framework }} failed to install" --label "bot" --body "$LOG_URL"
       - name: Benchmark ${{ matrix.framework }}
         id: run
         run: python runbenchmark.py ${{ matrix.framework }} ${{ matrix.options }}
