@@ -117,11 +117,12 @@ jobs:
           echo "Found " $(echo "$NUMBERS" | wc -l) " issues: $NUMBERS"
           NUMBER=$(echo "$NUMBERS" | sed -E 's/[^0-9]//g' | head -n1)
           
+          ls results/
           echo "During a routine test ${{ matrix.framework }} installed successfully but failed to pass the test benchmark." > error.txt
-          echo "```" >> error.txt
+          echo "\`\`\`" >> error.txt
           cat results/results.csv >> error.txt
-          echo "```" >> error.txt
-          echo "For more information, see the logs: $LOG_URL\n"
+          echo "\`\`\`" >> error.txt
+          echo "For more information, see the logs: $LOG_URL\n" >> error.txt
           
           if [[ -z "$NUMBER" ]]; then  
             gh issue create --title "$TITLE" --label "bot" --body-file error.txt
