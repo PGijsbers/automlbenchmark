@@ -91,8 +91,8 @@ jobs:
           echo "Found " $(echo "$NUMBERS" | wc -l) " issues: $NUMBERS"
           NUMBER=$(echo "$NUMBERS" | sed -E 's/[^0-9]//g' | head -n1)
           
-          echo "During a routine test installation of ${{ matrix.framework }} failed.\n"\
-               "For more information, see the logs: $LOG_URL\n" > error.txt
+          echo "During a routine test installation of ${{ matrix.framework }} failed."\
+               "For more information, see the logs: $LOG_URL" > error.txt
           
           if [[ -z "$NUMBER" ]]; then  
             gh issue create --title "$TITLE" --label "bot" --body-file error.txt
@@ -119,10 +119,9 @@ jobs:
           echo "Found " $(echo "$NUMBERS" | wc -l) " issues: $NUMBERS"
           NUMBER=$(echo "$NUMBERS" | sed -E 's/[^0-9]//g' | head -n1)
           
-          ls results/
-          echo "During a routine test ${{ matrix.framework }} installed successfully but failed to pass the test benchmark.\n" > error.txt
-          python -c "import pandas as pd; df = pd.read_csv('results/results.csv'); print(df.to_markdown())" >> error.txt
-          echo "\nFor more information, see the logs: $LOG_URL\n" >> error.txt
+          echo "During a routine test ${{ matrix.framework }} installed successfully but failed to pass the test benchmark." > error.txt
+          python -c "import pandas as pd; df = pd.read_csv('results/results.csv'); print('\n'+df.to_markdown()+'\n')" >> error.txt
+          echo "For more information, see the logs: $LOG_URL" >> error.txt
           
           if [[ -z "$NUMBER" ]]; then  
             gh issue create --title "$TITLE" --label "bot" --body-file error.txt
