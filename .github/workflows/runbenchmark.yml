@@ -84,12 +84,19 @@ jobs:
           GITHUB_PAT: ${{ secrets.PUBLIC_ACCESS_GITHUB_PAT }}
       - name: Report Installation Failure
         if: failure() && steps.install.conclusion == 'failure'
-        run: |
-          LOG_URL="https://github.com/PGijsbers/automlbenchmark/actions/runs/9562001614/job/26357453940#step:7:1"
-          github issue create --title "${{ matrix.framework }} failed to install" --label "bot" --body "$LOG_URL"
+        run: |  # https://github.com/orgs/community/discussions/8945 can't link to job in matrix...
+          echo ${{ toJSON(github) }}
+          LOG_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/"
+          gh issue create --title "${{ matrix.framework }} failed to install" --label "bot" --body "$LOG_URL"
+        env:
+          GH_TOKEN: ${{ github.token }}
       - name: Benchmark ${{ matrix.framework }}
         id: run
-        run: python runbenchmark.py ${{ matrix.framework }} ${{ matrix.options }}
+        run: python runbenchmark.py ${{ matrix.framework }} ${{ matrix.options }} -f 0
       - name: Report Running Failure
         if: failure() && steps.run.conclusion == 'failure'
-        run: echo "Report running failure!"
+        run: |
+          LOG_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/"
+          gh issue create --title "${{ matrix.framework }} fails on test" --label "bot" --body "$LOG_URL"
+        env:
+          GH_TOKEN: ${{ github.token }}
