@@ -118,7 +118,9 @@ jobs:
           NUMBER=$(echo "$NUMBERS" | sed -E 's/[^0-9]//g' | head -n1)
           
           echo "During a routine test ${{ matrix.framework }} installed successfully but failed to pass the test benchmark." > error.txt
+          echo "```" >> error.txt
           cat results/results.csv >> error.txt
+          echo "```" >> error.txt
           echo "For more information, see the logs: $LOG_URL\n"
           
           if [[ -z "$NUMBER" ]]; then  
