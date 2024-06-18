@@ -55,23 +55,23 @@ jobs:
         # (The job is started by a workflow dispatch) && !(this is the matrix job that represents the workflow trigger)
         run: |
           exit 1
-      - name: Runs on ${{ inputs.os }}
-        run: echo Preparing to benchmark ${{ inputs.framework }} ${{ inputs.options }}
+      - name: Runs on ${{ matrix.os }}
+        run: echo Preparing to benchmark ${{ matrix.framework }} ${{ matrix.options }}
       - name: Checkout ${{ github.ref_name }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
-      - name: Install Py${{ inputs.python_version }}
-        uses: actions/setup-python@v4
+      - name: Install Py${{ matrix.python_version }}
+        uses: actions/setup-python@v5
         with:
-          python-version: ${{ inputs.python_version }}
+          python-version: ${{ matrix.python_version }}
       - name: Install benchmark dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
-      - name: Install ${{ inputs.framework }}
-        run: python runbenchmark.py ${{ inputs.framework }} -s only
+      - name: Install ${{ matrix.framework }}
+        run: python runbenchmark.py ${{ matrix.framework }} -s only
         env:
           GITHUB_PAT: ${{ secrets.PUBLIC_ACCESS_GITHUB_PAT }}
-      - name: Benchmark ${{ inputs.framework }}
-        run: python runbenchmark.py ${{ inputs.framework }} ${{ inputs.options }}
+      - name: Benchmark ${{ matrix.framework }}
+        run: python runbenchmark.py ${{ matrix.framework }} ${{ matrix.options }}
