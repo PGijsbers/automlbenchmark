@@ -9,7 +9,7 @@ permissions:
 
 on:
   schedule:
-    - cron: '0/5 * * * *'
+    - cron: '20 * * * *'
 
   workflow_dispatch:
     inputs:
@@ -83,7 +83,7 @@ jobs:
         env:
           GITHUB_PAT: ${{ secrets.PUBLIC_ACCESS_GITHUB_PAT }}
       - name: Report Installation Failure
-        if: failure() && steps.install.conclusion == 'failure'
+        if: failure() && steps.install.conclusion == 'failure' && matrix.framework != ''
         run: |  # https://github.com/orgs/community/discussions/8945 can't link to job in matrix...
           LOG_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/"
           TITLE="${{ matrix.framework }} failed to install"
