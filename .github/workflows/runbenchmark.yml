@@ -85,9 +85,16 @@ jobs:
       - name: Report Installation Failure
         if: failure() && steps.install.conclusion == 'failure'
         run: |  # https://github.com/orgs/community/discussions/8945 can't link to job in matrix...
-          echo ${{ toJSON(github) }}
           LOG_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/"
-          gh issue create --title "${{ matrix.framework }} failed to install" --label "bot" --body "$LOG_URL"
+          TITLE="${{ matrix.framework }} failed to install"
+          NUMBERS=$(gh issue list --json number,title,closed --jq '.[] | select( .title == "'"$TITLE"'") | select( .closed == false ) | {number: .number}')
+          echo "Found " $(echo "$NUMBERS" | wc -l) " issues: $NUMBERS"
+          NUMBER=$(echo "$NUMBERS" | sed -E 's/[^0-9]//g' | head -n1)
+          if [[ -z "$NUMBER" ]]; then  
+            gh issue create --title "$TITLE" --label "bot" --body "$LOG_URL"
+          else
+            gh issue comment "$NUMBER" --body "issues persist: $LOG_URL"
+          fi
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Benchmark ${{ matrix.framework }}
