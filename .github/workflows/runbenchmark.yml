@@ -3,6 +3,10 @@
 # It can also be invoked manually to call `runbenchmark` for a single framework.
 name: Run `runbenchmark.py`
 
+permissions:
+  contents: read
+  issues: write
+
 on:
   schedule:
     - cron: '0/5 * * * *'
@@ -44,7 +48,7 @@ jobs:
       matrix:
         os: ['ubuntu-latest']
         python: ['3.9']
-        framework: ['autogluon', 'autosklearn', 'flaml', 'gama', 'h2oautoml','lama', 'naml', 'randomforest', 'tpot']
+        framework: ['autogluon', 'autosklearn', 'flaml', 'gama', 'h2oautoml','lightautoml', 'naiveautoml', 'randomforest', 'tpot']
         include:
           - python: ${{ inputs.python_version }}
             os: ${{ needs.set_os.outputs.os }}
@@ -59,7 +63,8 @@ jobs:
         run: |
           exit 1
       - name: Runs on ${{ matrix.os }}
-        run: echo Preparing to benchmark ${{ matrix.framework }} ${{ matrix.options }}
+        run: |
+          echo Preparing to benchmark ${{ matrix.framework }} ${{ matrix.options }}
       - name: Checkout ${{ github.ref_name }}
         uses: actions/checkout@v4
         with:
@@ -73,8 +78,16 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
       - name: Install ${{ matrix.framework }}
+        id: install
         run: python runbenchmark.py ${{ matrix.framework }} -s only
         env:
           GITHUB_PAT: ${{ secrets.PUBLIC_ACCESS_GITHUB_PAT }}
+      - name: Report Installation Failure
+        if: failure() && steps.install.conclusion == 'failure'
+        run: echo "Installation failure!"
       - name: Benchmark ${{ matrix.framework }}
+        id: run
         run: python runbenchmark.py ${{ matrix.framework }} ${{ matrix.options }}
+      - name: Report Running Failure
+        if: failure() && steps.run.conclusion == 'failure'
+        run: echo "Report running failure!"
