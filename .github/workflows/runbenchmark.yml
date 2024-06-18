@@ -1,3 +1,6 @@
+# This workflow periodically runs the automl benchmark for the supported frameworks to report
+# any errors that may arise from updates versions.
+# It can also be invoked manually to call `runbenchmark` for a single framework.
 name: Run `runbenchmark.py`
 
 on:
