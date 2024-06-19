@@ -9,7 +9,7 @@ permissions:
 
 on:
   schedule:
-    - cron: '23/5 0-10 * * 3'
+    - cron: '23/5 0-12 * * 3'
 
   workflow_dispatch:
     inputs:
@@ -78,14 +78,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
-      - name: Install ${{ matrix.framework }}
-        if: matrix.framework != ''
-        id: install
-        run: python runbenchmark.py ${{ matrix.framework }} -s only
-        env:
-          GITHUB_PAT: ${{ secrets.PUBLIC_ACCESS_GITHUB_PAT }}
+      - uses: ./.github/actions/runbenchmark
+        id: benchmark
+        with:
+          framework: matrix.framework
       - name: Report Installation Failure
-        if: failure() && steps.install.conclusion == 'failure' && github.event_name != 'workflow_dispatch'
+        if: failure() && steps.benchmark.outputs.failure == 'install' && github.event_name != 'workflow_dispatch'
         run: |  # https://github.com/orgs/community/discussions/8945 can't link to job in matrix...
           LOG_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/"
           TITLE="${{ matrix.framework }} failed to install"
@@ -103,16 +101,8 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ github.token }}
-      - name: Benchmark ${{ matrix.framework }}
-        id: run
-        if: matrix.framework != ''
-        run: |
-          python runbenchmark.py ${{ matrix.framework }} ${{ matrix.options }} -f 0
-          if grep -q "Error" "results/results.csv"; then
-            exit 1
-          fi
       - name: Report Running Failure
-        if: failure() && steps.run.conclusion == 'failure' && github.event_name != 'workflow_dispatch'
+        if: failure() && steps.benchmark.outputs.failure == 'run' && github.event_name != 'workflow_dispatch'
         run: |
           python -m pip install tabulate
           
@@ -133,9 +123,3 @@ jobs:
           fi
         env:
           GH_TOKEN: ${{ github.token }}
-      - name: Save Results
-        if: always() && matrix.framework != ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.framework }}-results
-          path: results
