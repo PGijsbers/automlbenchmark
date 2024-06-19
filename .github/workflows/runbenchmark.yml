@@ -81,7 +81,7 @@ jobs:
       - uses: ./.github/actions/runbenchmark
         id: benchmark
         with:
-          framework: matrix.framework
+          framework: ${{ matrix.framework }}
       - name: Report Installation Failure
         if: failure() && steps.benchmark.outputs.failure == 'install' && github.event_name != 'workflow_dispatch'
         run: |  # https://github.com/orgs/community/discussions/8945 can't link to job in matrix...
