@@ -9,7 +9,7 @@ permissions:
 
 on:
   schedule:
-    - cron: '30 4 * * 3'
+    - cron: '23/5 0-10 * * 3'
 
   workflow_dispatch:
     inputs:
@@ -74,16 +74,18 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Install benchmark dependencies
+        if: matrix.framework != ''
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
       - name: Install ${{ matrix.framework }}
+        if: matrix.framework != ''
         id: install
         run: python runbenchmark.py ${{ matrix.framework }} -s only
         env:
           GITHUB_PAT: ${{ secrets.PUBLIC_ACCESS_GITHUB_PAT }}
       - name: Report Installation Failure
-        if: failure() && steps.install.conclusion == 'failure' && matrix.framework != '' && github.event_name != 'workflow_dispatch'
+        if: failure() && steps.install.conclusion == 'failure' && github.event_name != 'workflow_dispatch'
         run: |  # https://github.com/orgs/community/discussions/8945 can't link to job in matrix...
           LOG_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/"
           TITLE="${{ matrix.framework }} failed to install"
@@ -103,6 +105,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
       - name: Benchmark ${{ matrix.framework }}
         id: run
+        if: matrix.framework != ''
         run: |
           python runbenchmark.py ${{ matrix.framework }} ${{ matrix.options }} -f 0
           if grep -q "Error" "results/results.csv"; then
@@ -131,7 +134,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Save Results
-        if: always()
+        if: always() && matrix.framework != ''
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.framework }}-results
