@@ -12,6 +12,11 @@ inputs:
     default: 'test'
     required: false
 
+  store-results:
+    description: "If set (default), store the `results` directory as run artifact."
+    default: true
+    required: false
+
 #  folds:
 #    description: "Comma-separated list of fold to evaluate, as per `--fold`"
 #    default: "0"
@@ -38,7 +43,7 @@ runs:
         fi
       shell: bash
     - name: Save Results
-      if: always()
+      if: always() && inputs.store-results
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.framework }}-results
@@ -56,5 +61,5 @@ runs:
         fi
         echo "failure=$FAILURE" >> $GITHUB_OUTPUT
       env:
-        RUN_FAILURE: ${{ step.run.conclusion }}
-        INSTALL_FAILURE: ${{ step.install.conclusion }}
+        RUN_FAILURE: ${{ steps.run.conclusion }}
+        INSTALL_FAILURE: ${{ steps.install.conclusion }}
