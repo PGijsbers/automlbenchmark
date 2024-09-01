@@ -17,11 +17,6 @@ inputs:
     default: true
     required: false
 
-#  folds:
-#    description: "Comma-separated list of fold to evaluate, as per `--fold`"
-#    default: "0"
-#    required: false
-
 outputs:
   failure:
     description: "Indicates which step failed, if any. One of 'install', 'run', or ''."
