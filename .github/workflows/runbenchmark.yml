@@ -9,7 +9,7 @@ permissions:
 
 on:
   schedule:
-    - cron: '23/5 0-12 * * 3'
+    - cron: '3 3 * * 1'
 
   workflow_dispatch:
     inputs:
