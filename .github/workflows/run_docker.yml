@@ -41,4 +41,4 @@ jobs:
       - name: Run ${{ matrix.framework }}
         run: |
           source venv/bin/activate
-          python runbenchmark.py ${{ matrix.framework }} -t ${{ matrix.task }} -m ${{ matrix.mode}} -f 0 -e -s force
+          yes | python runbenchmark.py ${{ matrix.framework }} -t ${{ matrix.task }} -m ${{ matrix.mode}} -f 0 -e -s force
