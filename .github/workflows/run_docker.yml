@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        framework: [constantpredictor, randomforest, autogluon]
+        framework: [constantpredictor, randomforest, autogluon, flaml]
         task: [iris, kc2, cholesterol]
         mode: [local, docker]
       fail-fast:  false
