@@ -94,13 +94,24 @@ def run(dataset, config):
 
     models_dir = tempfile.mkdtemp() + os.sep  # passed to AG
 
+    init_params = dict(
+        label=label,
+        eval_metric=perf_metric.name,
+        path=models_dir,
+        problem_type=problem_type,
+    )
+    train_params = dict(
+        train_data=train_path, time_limit=time_limit, **training_params
+    )
+    log.info(f"\n**** Init Parameters ****\n")
+    log.info(f"\n{init_params}\n")
+    log.info(f"\n**** Train Parameters ****\n")
+    log.info(f"\n{train_params}\n")
+    log.info(f"\n**** Start Fit ****\n")
     with Timer() as training:
         predictor = TabularPredictor(
-            label=label,
-            eval_metric=perf_metric.name,
-            path=models_dir,
-            problem_type=problem_type,
-        ).fit(train_data=train_path, time_limit=time_limit, **training_params)
+            **init_params,
+        ).fit(**train_params)
 
     log.info(f"Finished fit in {training.duration}s.")
 
