@@ -36,10 +36,9 @@ jobs:
         run: python runbenchmark.py ${{ inputs.framework }} -s only
         env:
           GITHUB_PAT: ${{ secrets.PUBLIC_ACCESS_GITHUB_PAT }}
-      - name: Prepare the Data (${{ inputs.options }})
-        run: python runbenchmark.py constantpredictor ${{ inputs.options }}
-      - name: Run AutoGluon
+      - name: Run AG in AMLB (prep data) (${{ inputs.options }})
+        run: python runbenchmark.py autogluon ${{ inputs.options }}
+      - name: Run AutoGluon outside AMLB
         run: |
-          source frameworks/AutoGluon/venv/bin/activate
           /home/runner/work/automlbenchmark/automlbenchmark/frameworks/AutoGluon/venv/bin/python -W ignore -m pip list
           /home/runner/work/automlbenchmark/automlbenchmark/frameworks/AutoGluon/venv/bin/python -W ignore ag_mwe.py ${{ inputs.time }} '/home/runner/.cache/openml/org/openml/www/datasets/46871/dataset_train_0.parquet' '/home/runner/.cache/openml/org/openml/www/datasets/46871/dataset_test_0.parquet'
