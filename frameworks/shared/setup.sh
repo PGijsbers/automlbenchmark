@@ -53,4 +53,5 @@ PIP() {
 echo "PY=$py_exec"
 echo "PIP=$pip_exec"
 
-PIP install --no-cache-dir -r $SHARED_DIR/requirements.txt
+echo "Not installing shared requirements"
+#PIP install --no-cache-dir -r $SHARED_DIR/requirements.txt
