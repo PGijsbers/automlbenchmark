@@ -40,6 +40,6 @@ jobs:
         run: python runbenchmark.py constantpredictor ${{ inputs.options }}
       - name: Run AutoGluon
         run: |
-          source frameworks/autogluon/venv/bin/activate
-          python -m pip list
-          python ag_mwe.py ${{ inputs.time }} '/home/runner/.cache/openml/org/openml/www/datasets/46871/dataset_train_0.parquet' '/home/runner/.cache/openml/org/openml/www/datasets/46871/dataset_test_0.parquet'
+          source frameworks/AutoGluon/venv/bin/activate
+          /home/runner/work/automlbenchmark/automlbenchmark/frameworks/AutoGluon/venv/bin/python -W ignore -m pip list
+          /home/runner/work/automlbenchmark/automlbenchmark/frameworks/AutoGluon/venv/bin/python -W ignore ag_mwe.py ${{ inputs.time }} '/home/runner/.cache/openml/org/openml/www/datasets/46871/dataset_train_0.parquet' '/home/runner/.cache/openml/org/openml/www/datasets/46871/dataset_test_0.parquet'
