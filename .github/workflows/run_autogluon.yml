@@ -1,4 +1,4 @@
-name: Run `runbenchmark.py`
+name: AutoGluon
 
 on:
   workflow_dispatch:
