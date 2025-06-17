@@ -12,7 +12,7 @@ on:
       options:
         default: 'openml/t/363580 -f 0'
       time:
-        default: 600
+        default: 60
 
 jobs:
   run_benchmark:
